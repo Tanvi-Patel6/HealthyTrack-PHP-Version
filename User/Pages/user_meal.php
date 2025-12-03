@@ -1,125 +1,239 @@
-<?php 
-    session_start(); 
-    $page_title = "HealthyTrack - View Meals"; 
+<?php
+session_start();
+$page_title = "HealthyTrack - View Meals";
 
-    require_once __DIR__ . '/../config/db.php'; 
-    require_once __DIR__ . '/../includes/auth_check.php'; 
-    require_once __DIR__ . '/../includes/header.php'; 
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth_check.php';
+require_once __DIR__ . '/../includes/header.php';
 
- $user_id = $_SESSION['user_id'];
-$days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+$user_id = $_SESSION['user_id'];
 
-$all_meals = [];
-$result = mysqli_query($cn, "SELECT * FROM meal_plans WHERE user_id = '$user_id'");
-while ($row = mysqli_fetch_assoc($result)) {
-    $all_meals[$row['meal_day']][] = $row;
+// Filters
+$day  = $_GET['meal_day']  ?? "";
+$date = $_GET['meal_date'] ?? "";
+
+// Base query
+$sql = "SELECT * FROM meal_plans WHERE user_id = '$user_id'";
+
+// Apply filters
+if (isset($_GET['day_search']) && $day != "") {
+  $sql .= " AND meal_day = '$day'";
 }
 
+if (isset($_GET['date_search']) && $date != "") {
+  $sql .= " AND meal_date = '$date'";
+}
+
+$sql .= " ORDER BY meal_date ASC, meal_time ASC";
+$result = mysqli_query($cn, $sql);
 ?>
+
 <style>
+  html,
   body {
-    min-height: 100vh;
+    height: 100%;
+  }
+
+  body {
     display: flex;
     flex-direction: column;
+    background: #f5f7fa;
   }
-  .flex-grow-1 {
-    flex-grow: 1;
+
+  .content-wrapper {
+    flex: 1;
   }
-  .accordion-button {
-    background: linear-gradient(90deg, #5b8dbf, #89c2d9);
-    color: #fff;
+
+  .container-custom {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px 0;
+  }
+
+  /* Title */
+  .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #34495e;
+    margin-bottom: 20px;
+  }
+
+  /* Search Box */
+  .search-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background: #fff;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+  }
+
+  .search-box label {
     font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: background 0.3s;
   }
-  .accordion-button:hover {
-    background: linear-gradient(90deg, #467aa0, #6fa5be);
-  }
-  .accordion-item {
+
+  .search-box select,
+  .search-box input[type="date"] {
+    padding: 10px 12px;
     border-radius: 8px;
-    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    font-size: 15px;
+    width: 180px;
   }
-  .table thead th {
+
+  .search-box button {
+    padding: 11px 22px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .search-box .btn-day {
     background: #1f4e79;
     color: #fff;
   }
-  .table tbody tr:hover {
-    background-color: #e6f0fa;
+
+  .search-box .btn-day:hover {
+    background: #163e5c;
   }
-  .badge-meal {
-    font-size: 0.85rem;
-    padding: 0.35em 0.65em;
-    border-radius: 0.5rem;
+
+  .search-box .btn-date {
+    background: #2b9348;
+    color: #fff;
   }
-  .table-responsive {
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    border-radius: 8px;
+
+  .search-box .btn-date:hover {
+    background: #1f6f37;
+  }
+
+  .search-box .btn-reset {
+    background: #6c757d;
+    color: #fff;
+  }
+
+  .search-box .btn-reset:hover {
+    background: #495057;
+  }
+
+  /* Table */
+  .table-container {
+    background: #fff;
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    background: #1e293b;
+    color: white;
+    padding: 14px;
+    text-align: left;
+    font-size: 15px;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+  }
+
+  tr:hover td {
+    background: #f1f5f9;
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #6b7280;
   }
 </style>
 
-<div class="flex-grow-1">
-  <div class="container mt-5 mb-4">
-        <h2 class="text-center mb-4 display-6 fw-bold"><i class="fas fa-burger"></i> 
+<div class="content-wrapper">
+  <div class="container container-custom">
+    <h2 class="page-title"><i class="fas fa-utensils"></i> Your Meal Plan</h2>
 
- 7 Day Healthy Diet Plan</h2>
+    <!-- Search Section -->
+    <form method="GET" class="search-box">
+      <!-- Day Search -->
+      <div>
+        <label>Search by Day</label><br>
+        <select name="meal_day">
+          <option value="">-- Select Day --</option>
+          <?php
+          $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+          foreach ($days as $d) {
+            $selected = ($day == $d) ? "selected" : "";
+            echo "<option value='$d' $selected>$d</option>";
+          }
+          ?>
+        </select>
+      </div>
+      <div class="d-flex align-items-end">
+        <button type="submit" name="day_search" class="btn btn-day">Search Day</button>
+      </div>
 
-        <div class="accordion" id="dietAccordion">
-            <?php foreach ($days as $index => $day): ?>
-            <div class="accordion-item mb-3 shadow-sm">
-                <h2 class="accordion-header" id="heading<?= $index ?>">
-                    <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $index ?>" aria-expanded="false" aria-controls="collapse<?= $index ?>">
-                        <?= $day ?>
-                    </button>
-                </h2>
-                <div id="collapse<?= $index ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $index ?>" data-bs-parent="#dietAccordion">
-                    <div class="accordion-body">
-                        <?php if (!empty($all_meals[$day])): ?>
-                        <div class="table-responsive">
-                            <table class="table table-striped align-middle mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Meal Time</th>
-                                        <th>Meal Name</th>
-                                        <th>Calories</th>
-                                        <th>Protein</th>
-                                        <th>Carbs</th>
-                                        <th>Fats</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($all_meals[$day] as $meal): ?>
-                                    <tr>
-                                        <td>
-                                            <span class="badge badge-meal 
-                                              <?= $meal['meal_time'] == 'Breakfast' ? 'bg-warning text-dark' : ($meal['meal_time']=='Lunch' ? 'bg-success' : 'bg-danger') ?>">
-                                              <?= $meal['meal_time'] ?>
-                                            </span>
-                                        </td>
-                                        <td><?= $meal['meal_name'] ?></td>
-                                        <td><?= rtrim(rtrim($meal['calories'], '0'), '.') ?></td>
-                                        <td><?= rtrim(rtrim($meal['protein'], '0'), '.') ?></td>
-                                        <td><?= rtrim(rtrim($meal['carbs'], '0'), '.') ?></td>
-                                        <td><?= rtrim(rtrim($meal['fats'], '0'), '.') ?></td>
+      <!-- Date Search -->
+      <div>
+        <label>Search by Date</label><br>
+        <input type="date" name="meal_date" value="<?= htmlspecialchars($date) ?>">
+      </div>
+      <div class="d-flex align-items-end">
+        <button type="submit" name="date_search" class="btn btn-date">Search Date</button>
+      </div>
 
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <?php else: ?>
-                        <p class="text-muted fw-semibold">No meals assigned for <?= $day ?>.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
+      <!-- Reset -->
+      <div class="d-flex align-items-end">
+        <a href="user_meal.php" class="btn btn-reset">Reset</a>
+      </div>
+    </form>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table>
+        <tr>
+          <th>Meal Time</th>
+          <th>Meal Name</th>
+          <th>Calories</th>
+          <th>Protein</th>
+          <th>Carbs</th>
+          <th>Fats</th>
+          <th>Day</th>
+          <th>Date</th>
+        </tr>
+
+        <?php if (mysqli_num_rows($result) > 0): ?>
+          <?php while ($meal = mysqli_fetch_assoc($result)): ?>
+            <tr>
+              <td><?= htmlspecialchars($meal['meal_time']) ?></td>
+              <td><?= htmlspecialchars($meal['meal_name']) ?></td>
+              <td><?= rtrim(rtrim($meal['calories'], '0'), '.') ?></td>
+              <td><?= rtrim(rtrim($meal['protein'], '0'), '.') ?></td>
+              <td><?= rtrim(rtrim($meal['carbs'], '0'), '.') ?></td>
+              <td><?= rtrim(rtrim($meal['fats'], '0'), '.') ?></td>
+              <td><?= htmlspecialchars($meal['meal_day']) ?></td>
+              <td><?= htmlspecialchars($meal['meal_date']) ?></td>
+            </tr>
+          <?php endwhile; ?>
+        <?php else: ?>
+          <tr>
+            <td colspan="8" class="no-data">No meals found.</td>
+          </tr>
+        <?php endif; ?>
+      </table>
     </div>
+  </div>
 </div>
 
-</div>
-
-
-
-    <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

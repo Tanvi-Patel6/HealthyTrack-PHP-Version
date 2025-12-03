@@ -13,24 +13,27 @@ $feedback_result = mysqli_query($cn, "SELECT * FROM feedback_messages ORDER BY c
 
 
 <style>
-
-    body{
+    body {
         height: 100%;
         margin: 0;
         display: flex;
         flex-direction: column;
+    }
+
+    #content {
+        width: 1270px;
     }
 </style>
 <div id="content" class="container py-5">
     <h2 class="mb-4">📨 Message Center</h2>
 
     <ul class="nav nav-tabs mb-4" id="messageTabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">Contact Messages</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab">Feedback Messages</button>
-      </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">Contact Messages</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab">Feedback Messages</button>
+        </li>
     </ul>
 
     <div class="tab-content">
@@ -48,16 +51,17 @@ $feedback_result = mysqli_query($cn, "SELECT * FROM feedback_messages ORDER BY c
                     </tr>
                 </thead>
                 <tbody>
-                <?php $i=1; while($row = mysqli_fetch_assoc($contact_result)): ?>
-                    <tr>
-                        <td><?= $i++ ?></td>
-                        <td><?= htmlspecialchars($row['name']) ?></td>
-                        <td><?= htmlspecialchars($row['email']) ?></td>
-                        <td><?= htmlspecialchars($row['subject']) ?></td>
-                        <td><?= htmlspecialchars($row['message']) ?></td>
-                        <td><?= $row['created_at'] ?></td>
-                    </tr>
-                <?php endwhile; ?>
+                    <?php $i = 1;
+                    while ($row = mysqli_fetch_assoc($contact_result)): ?>
+                        <tr>
+                            <td><?= $i++ ?></td>
+                            <td><?= htmlspecialchars($row['name']) ?></td>
+                            <td><?= htmlspecialchars($row['email']) ?></td>
+                            <td><?= htmlspecialchars($row['subject']) ?></td>
+                            <td><?= htmlspecialchars($row['message']) ?></td>
+                            <td><?= $row['created_at'] ?></td>
+                        </tr>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
@@ -75,15 +79,16 @@ $feedback_result = mysqli_query($cn, "SELECT * FROM feedback_messages ORDER BY c
                     </tr>
                 </thead>
                 <tbody>
-                <?php $i=1; while($row = mysqli_fetch_assoc($feedback_result)): ?>
-                    <tr>
-                        <td><?= $i++ ?></td>
-                        <td><?= htmlspecialchars($row['name']) ?></td>
-                        <td><?= htmlspecialchars($row['email']) ?></td>
-                        <td><?= htmlspecialchars($row['feedback']) ?></td>
-                        <td><?= $row['created_at'] ?></td>
-                    </tr>
-                <?php endwhile; ?>
+                    <?php $i = 1;
+                    while ($row = mysqli_fetch_assoc($feedback_result)): ?>
+                        <tr>
+                            <td><?= $i++ ?></td>
+                            <td><?= htmlspecialchars($row['name']) ?></td>
+                            <td><?= htmlspecialchars($row['email']) ?></td>
+                            <td><?= htmlspecialchars($row['feedback']) ?></td>
+                            <td><?= $row['created_at'] ?></td>
+                        </tr>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
@@ -93,12 +98,12 @@ $feedback_result = mysqli_query($cn, "SELECT * FROM feedback_messages ORDER BY c
 <script>
     // Initialize Bootstrap tabs
     var triggerTabList = [].slice.call(document.querySelectorAll('#messageTabs button'))
-    triggerTabList.forEach(function (triggerEl) {
-      var tabTrigger = new bootstrap.Tab(triggerEl)
-      triggerEl.addEventListener('click', function (event) {
-        event.preventDefault()
-        tabTrigger.show()
-      })
+    triggerTabList.forEach(function(triggerEl) {
+        var tabTrigger = new bootstrap.Tab(triggerEl)
+        triggerEl.addEventListener('click', function(event) {
+            event.preventDefault()
+            tabTrigger.show()
+        })
     })
 </script>
 

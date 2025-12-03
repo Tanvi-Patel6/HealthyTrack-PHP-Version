@@ -1,5 +1,5 @@
 <?php
-$page_title = "HealthyTrack - Forms"; 
+$page_title = "HealthyTrack - Forms";
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth_check.php';
 
@@ -17,7 +17,8 @@ require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <style>
-  html, body {
+  html,
+  body {
     height: 100%;
     margin: 0;
     display: flex;
@@ -26,8 +27,7 @@ require_once __DIR__ . '/../includes/header.php';
   }
 
   #content {
-    flex: 1;
-    padding: 50px 20px;
+    width: 1270px;
   }
 
   .table-container {
@@ -42,7 +42,7 @@ require_once __DIR__ . '/../includes/header.php';
   h2 {
     font-weight: 700;
     color: #023047;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     margin-bottom: 30px;
     display: flex;
     align-items: center;
@@ -124,6 +124,7 @@ require_once __DIR__ . '/../includes/header.php';
       opacity: 0;
       transform: translateY(15px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -137,7 +138,7 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- 🔍 Search & Filter Bar -->
     <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search by Username..."  required>
+      <input type="text" id="searchInput" placeholder="Search by Username..." required>
       <select id="filterGender">
         <option value="">Filter by Gender</option>
         <option value="Male">Male</option>
@@ -158,6 +159,7 @@ require_once __DIR__ . '/../includes/header.php';
             <th>Gender</th>
             <th>Goal</th>
             <th>Blood Group</th>
+            <th>Type</th>
           </tr>
         </thead>
         <tbody>
@@ -171,10 +173,13 @@ require_once __DIR__ . '/../includes/header.php';
                 <td><?= htmlspecialchars($row['gender']); ?></td>
                 <td><?= htmlspecialchars($row['goal']); ?></td>
                 <td><?= htmlspecialchars($row['blood_group']); ?></td>
+                <td><?= htmlspecialchars($row['diet_type']); ?></td>
               </tr>
             <?php endwhile; ?>
           <?php else: ?>
-            <tr><td colspan="7" class="no-results">No forms submitted yet.</td></tr>
+            <tr>
+              <td colspan="7" class="no-results">No forms submitted yet.</td>
+            </tr>
           <?php endif; ?>
         </tbody>
       </table>

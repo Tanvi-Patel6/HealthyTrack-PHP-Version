@@ -1,5 +1,5 @@
 <?php
-$page_title = "HealthyTrack - View Users"; 
+$page_title = "HealthyTrack - View Users";
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/header.php';
 
@@ -19,7 +19,7 @@ if (isset($_GET['search']) && $_GET['search'] !== "") {
 <style>
     body {
         background: linear-gradient(to right, #f0fdf4, #e6f7f3);
-       
+
         min-height: 100vh;
         margin: 0;
         display: flex;
@@ -27,8 +27,7 @@ if (isset($_GET['search']) && $_GET['search'] !== "") {
     }
 
     #content {
-        flex: 1;
-        padding: 50px 0;
+        width: 1250px;
     }
 
     h2 {
@@ -78,10 +77,10 @@ if (isset($_GET['search']) && $_GET['search'] !== "") {
     /* Card Grid */
     .user-grid {
         display: grid;
-        grid-template-columns: repeat(2,1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 25px;
         width: 80%;
-        margin-left:10%;
+        margin-left: 10%;
         margin-top: 30px;
     }
 
@@ -126,9 +125,11 @@ if (isset($_GET['search']) && $_GET['search'] !== "") {
             flex-direction: column;
             align-items: center;
         }
+
         .search-bar input {
             width: 100%;
         }
+
         .search-bar button {
             width: 100%;
         }
@@ -141,13 +142,12 @@ if (isset($_GET['search']) && $_GET['search'] !== "") {
 
     <!-- Search Form -->
     <form method="GET" class="search-bar">
-        <input 
-            type="text" 
-            name="search" 
-            placeholder="Search by name or email..." 
+        <input
+            type="text"
+            name="search"
+            placeholder="Search by name or email..."
             value="<?php echo htmlspecialchars($search); ?>"
-            required
-        >
+            required>
         <button type="submit">🔍 Search</button>
     </form>
 

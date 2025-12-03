@@ -1,25 +1,25 @@
 <?php
-$page_title = "HealthyTrack - Manage Admins"; 
+$page_title = "HealthyTrack - Manage Admins";
 require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../includes/auth_check.php'; 
+require_once __DIR__ . '/../includes/auth_check.php';
 
 // ✅ Only allow logged-in admins
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../index.php");
-    exit();
+  header("Location: ../index.php");
+  exit();
 }
 
 // ✅ Handle delete request
 if (isset($_GET['delete_id'])) {
-    $delete_id = intval($_GET['delete_id']); 
+  $delete_id = intval($_GET['delete_id']);
 
-    // Prevent deleting yourself
-    if ($delete_id == $_SESSION['user_id']) {
-        $msg = "❌ You cannot delete your own account!";
-    } else {
-        $cn->query("DELETE FROM admin WHERE id = $delete_id");
-        $msg = "✅ Admin deleted successfully!";
-    }
+  // Prevent deleting yourself
+  if ($delete_id == $_SESSION['user_id']) {
+    $msg = "❌ You cannot delete your own account!";
+  } else {
+    $cn->query("DELETE FROM admin WHERE id = $delete_id");
+    $msg = "✅ Admin deleted successfully!";
+  }
 }
 
 // ✅ Fetch all admins
@@ -29,7 +29,8 @@ require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <style>
-  html, body {
+  html,
+  body {
     height: 100%;
     margin: 0;
     display: flex;
@@ -39,8 +40,7 @@ require_once __DIR__ . '/../includes/header.php';
   }
 
   #content {
-    flex: 1;
-    padding: 50px 20px;
+    width: 1260px;
   }
 
   .admin-container {
@@ -119,6 +119,7 @@ require_once __DIR__ . '/../includes/header.php';
       opacity: 0;
       transform: translateY(15px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -154,9 +155,9 @@ require_once __DIR__ . '/../includes/header.php';
                 <td>
                   <?php if ($row['id'] != $_SESSION['user_id']) { ?>
                     <a href="?delete_id=<?= $row['id']; ?>"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Are you sure you want to delete this admin?');">
-                       <i class="bi bi-trash3"></i> Delete
+                      class="btn btn-danger btn-sm"
+                      onclick="return confirm('Are you sure you want to delete this admin?');">
+                      <i class="bi bi-trash3"></i> Delete
                     </a>
                   <?php } else { ?>
                     <span class="badge bg-secondary"><i class="bi bi-person-circle"></i> Your Account</span>
@@ -165,7 +166,9 @@ require_once __DIR__ . '/../includes/header.php';
               </tr>
             <?php } ?>
           <?php else: ?>
-            <tr><td colspan="3" class="text-muted">No admins found.</td></tr>
+            <tr>
+              <td colspan="3" class="text-muted">No admins found.</td>
+            </tr>
           <?php endif; ?>
         </tbody>
       </table>
